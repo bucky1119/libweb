@@ -1,0 +1,56 @@
+name: libweb
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: libweb
+      MYSQL_PASSWORD: "bucky123@123!"
+      MYSQL_ROOT_PASSWORD: "rootpass"
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--log-bin-trust-function-creators=1"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    image: maven:3.8.8-eclipse-temurin-8
+    working_dir: /workspace
+    volumes:
+      - ./libweb_Backend:/workspace
+      - ./.m2:/root/.m2
+    command: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xms256m -Xmx512m -XX:+UseG1GC"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
+
+  frontend:
+    image: node:18
+    working_dir: /workspace
+    volumes:
+      - ./libweb_frontend:/workspace:delegated
+      - /workspace/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 9528"
+    ports:
+      - "9528:9528"
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+
+networks:
+  default:
+    name: libweb_net
+    external: true

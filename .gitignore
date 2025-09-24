@@ -1,3 +1,6 @@
 libweb_Backend/
 libweb_frontend/
 libweb_crawler/
+.m2/
+.venv/
+.vscode/

@@ -46,7 +46,7 @@ services:
       context: ./libweb_frontend
     container_name: frontend
     image: libweb_frontend:latest
-    restart: always
+    restart: always    git submodule foreach git pull origin main
     ports:
       - "8081:80"
     networks:
@@ -60,6 +60,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - frontend
       - backend
