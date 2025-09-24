@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: libweb
+      MYSQL_PASSWORD: bucky123@123!
+      TZ: Asia/Shanghai
+    command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--log-bin-trust-function-creators=1"]
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    networks:
+      - libweb_net
+
+  backend:
+    build:
+      context: ./libweb_Backend
+    container_name: backend
+    image: libweb_backend:latest
+    restart: always
+    ports:
+      - "8088:8088"
+    networks:
+      - libweb_net
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/my_database?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=libweb
+      - SPRING_DATASOURCE_PASSWORD=bucky123@123!
+      - SERVER_PORT=8088
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m -XX:+UseG1GC
+      - TZ=Asia/Shanghai
+
+  frontend:
+    build:
+      context: ./libweb_frontend
+    container_name: frontend
+    image: libweb_frontend:latest
+    restart: always
+    ports:
+      - "8081:80"
+    networks:
+      - libweb_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - libweb_net
+
+networks:
+  libweb_net:
+    driver: bridge
+
+volumes:
+  db_data:
