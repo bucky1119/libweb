@@ -1,0 +1,9 @@
+[submodule "libweb_Backend"]
+	path = libweb_Backend
+	url = https://github.com/bucky1119/libweb_Backend.git
+[submodule "libweb_frontend"]
+	path = libweb_frontend
+	url = https://github.com/bucky1119/libweb_frontend.git
+[submodule "libweb_crawler"]
+	path = libweb_crawler
+	url = https://github.com/bucky1119/libweb_crawler.git
