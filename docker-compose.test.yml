@@ -3,6 +3,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
+    container_name: mysql
     environment:
       MYSQL_DATABASE: my_database
       MYSQL_USER: libweb
@@ -21,7 +22,6 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - libweb_net
-
 
   backend:
     build:
