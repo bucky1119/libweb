@@ -40,6 +40,8 @@ services:
       - SERVER_PORT=8088
       - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m -XX:+UseG1GC
       - TZ=Asia/Shanghai
+    volumes:
+      - ./settings-docker.xml:/root/.m2/settings.xml
 
   frontend:
     build:
