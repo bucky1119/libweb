@@ -32,7 +32,7 @@ services:
     image: libweb_backend:latest
     restart: always
     ports:  
-      - "8088:8088"
+      - "8088:8088"  # 映射后端到宿主机 8088
     networks:
       - libweb_net
     depends_on:
@@ -54,7 +54,7 @@ services:
     image: libweb_frontend:latest
     restart: always   
     ports:
-      - "8081:80"
+      - "8087:80"  # 映射前端到宿主机 8087
     networks:
       - libweb_net
 
